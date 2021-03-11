@@ -4,7 +4,7 @@ import {
   clearTargetStorageContainer,
 } from "@azure/ai-document-translation";
 import { config } from "dotenv";
-import { extractBatchId } from "./helpers/extractBatchId";
+import { extractBatchId } from "./helpers/extractBatchId"; //helper that extracts the id from the operation-location value
 
 // Load environment variables from .env
 config();
@@ -39,17 +39,17 @@ async function main() {
   };
 
   // 1. Create a client using Key authentication
-  // Note that users can choose to create a root client or provide a path to get a subclient
-  // for example since we are cocnerned about batch we are creating a subclient for batch that we will
-  // use through the task.
+  // [REMOVE] Note that users can choose to create a root client or provide a path to get a subclient
+  // [REMOVE] for example since we are cocnerned about batch we are creating a subclient for batch that we will
+  // [REMOVE] use through the task.
   const batchClient = DocumentTranslation({ key }, endpoint).path("/batches");
 
   // 2. Submit the translate batch job
   const batch = await batchClient.post({ body: translationInput });
 
-  // Note: Before this check the type of glosaries can be either of the following
-  // SubmitBatchRequest202Response | SubmitBatchRequest400Response | SubmitBatchRequest401Response | SubmitBatchRequest429Response | SubmitBatchRequest500Response | SubmitBatchRequest503Response
-  // After the if block the type is narrowed down to SubmitBatchRequest202Response
+  // [REMOVE] Note: Before this check the type of glosaries can be either of the following
+  // [REMOVE] SubmitBatchRequest202Response | SubmitBatchRequest400Response | SubmitBatchRequest401Response | SubmitBatchRequest429Response | SubmitBatchRequest500Response | SubmitBatchRequest503Response
+  // [REMOVE] After the if block the type is narrowed down to SubmitBatchRequest202Response
   if (batch.status !== 202) {
     throw (
       batch.body.error ||
@@ -61,8 +61,7 @@ async function main() {
 
   // Translator batch jobs are long running operations, when the response has a 202 status it means that
   // the translation has been started. The response has a header "operation-location" that has a URL to check
-  // the status of the operation. extractBatchId extracts the id from the operation-location value. The value could also
-  // be used alternatively with client.pathUnchecked(batch.headers["operation-location"]).get()
+  // the status of the operation. extractBatchId extracts the id from the operation-location value.
   const batchJobId = extractBatchId(batch.headers["operation-location"]);
   const batchProgress = batchClient.subClient("/:id", batchJobId);
 
@@ -81,7 +80,7 @@ async function main() {
     }
   } while (!terminalStates.includes(progress.body.status));
 
-  // Check if the terminal state was Success otherwise throw an error
+  // [REMOVE] Check if the terminal state was Success otherwise throw an error
   if (progress.body.status !== "Succeeded") {
     throw (
       progress.body.error ||
