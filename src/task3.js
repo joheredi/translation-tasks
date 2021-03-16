@@ -1,10 +1,10 @@
-import {
-  BatchSubmissionRequest,
-  createBatchDocumentTranslationPathFirst as DocumentTranslation,
+const {
+  createBatchDocumentTranslationPathFirst,
   clearTargetStorageContainer,
-} from "@azure/ai-document-translation";
-import { config } from "dotenv";
-import { extractBatchId } from "./helpers/extractBatchId"; //helper that extracts the id from the operation-location value
+} = require("@azure/ai-document-translation");
+const { config } = require("dotenv");
+const { extractBatchId } = require("./helpers/extractBatchId"); //helper that extracts the id from the operation-location value
+const { wait } = require("./helpers/wait"); // Helper funtion to wait, by default it waits 30 seconds.
 
 // Load environment variables from .env
 config();
@@ -27,7 +27,7 @@ async function main() {
 
   // This is the batch request object that describes the source storage container
   // and the translation target
-  const translationInput: BatchSubmissionRequest = {
+  const translationInput = {
     inputs: [
       {
         source: {
@@ -42,7 +42,9 @@ async function main() {
   // [REMOVE] Note that users can choose to create a root client or provide a path to get a subclient
   // [REMOVE] for example since we are cocnerned about batch we are creating a subclient for batch that we will
   // [REMOVE] use through the task.
-  const batchClient = DocumentTranslation({ key }, endpoint).path("/batches");
+  const batchClient = createBatchDocumentTranslationPathFirst(endpoint, {
+    key,
+  }).path("/batches");
 
   // 2. Submit the translate batch job
   const batch = await batchClient.post({ body: translationInput });
@@ -69,7 +71,6 @@ async function main() {
   let progress;
   do {
     progress = await batchProgress.get();
-
     if (progress.status !== 200) {
       throw (
         progress.body.error ||
@@ -78,6 +79,8 @@ async function main() {
         )
       );
     }
+    // Wait before polling the service. By default waits 30000ms (30 seconds)
+    await wait();
   } while (!terminalStates.includes(progress.body.status));
 
   // [REMOVE] Check if the terminal state was Success otherwise throw an error
