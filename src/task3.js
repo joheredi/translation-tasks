@@ -4,7 +4,7 @@ const {
 } = require("@azure/ai-document-translation");
 const { config } = require("dotenv");
 const { extractBatchId } = require("./helpers/extractBatchId"); //helper that extracts the id from the operation-location value
-const { wait } = require("./helpers/wait"); // Helper funtion to wait, by default it waits 30 seconds.
+const { wait } = require("./helpers/wait"); // Helper funtion to wait, by default it waits 5 seconds.
 
 // Load environment variables from .env
 config();
@@ -79,7 +79,7 @@ async function main() {
         )
       );
     }
-    // Wait before polling the service. By default waits 30000ms (30 seconds)
+    // Wait before polling the service. By default waits 5000ms (5 seconds)
     await wait();
   } while (!terminalStates.includes(progress.body.status));
 

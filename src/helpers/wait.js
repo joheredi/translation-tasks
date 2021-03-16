@@ -1,7 +1,7 @@
 const { isReturnStatement } = require("typescript");
 
 module.exports = {
-  wait: (ms = 30000) => {
+  wait: (ms = 5000) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve();
