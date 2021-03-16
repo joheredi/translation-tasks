@@ -1,4 +1,4 @@
-import { createBatchDocumentTranslationPathFirst as DocumentTranslation } from "@azure/ai-document-translation";
+import { createBatchDocumentTranslationPathFirst } from "@azure/ai-document-translation";
 import { config } from "dotenv";
 
 // Load environment variables from .env
@@ -10,7 +10,7 @@ const key = process.env["API_KEY"] || "";
 async function main() {
   // 1. Create a client using Key authentication
   // [REMOVE] Note that the creation of the client is a factory function rather than a `new` class
-  const client = DocumentTranslation({ key }, endpoint);
+  const client = createBatchDocumentTranslationPathFirst(endpoint, { key });
 
   // 2. Get a list of the formats supported for glosary
   const glosaries = await client.path("/glossaries/formats").get();

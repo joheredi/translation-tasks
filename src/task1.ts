@@ -1,4 +1,4 @@
-import { createBatchDocumentTranslationVerbFirst as DocumentTranslation } from "@azure/ai-document-translation";
+import { createBatchDocumentTranslationVerbFirst } from "@azure/ai-document-translation";
 import { config } from "dotenv";
 
 // Load environment variables from .env
@@ -10,7 +10,7 @@ const key = process.env["API_KEY"] || "";
 async function main() {
   // 1. Create a client using Key authentication
   // [REMOVE] Note that the creation of the client is a factory function rather than a `new` class
-  const client = DocumentTranslation({ key }, endpoint);
+  const client = createBatchDocumentTranslationVerbFirst(endpoint, { key });
 
   // 2. Get a list of all the formats that DocumentTranslation can translate
   const formats = await client.request("GET /documents/formats");

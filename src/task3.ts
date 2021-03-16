@@ -1,10 +1,11 @@
 import {
   BatchSubmissionRequest,
-  createBatchDocumentTranslationPathFirst as DocumentTranslation,
+  createBatchDocumentTranslationPathFirst,
   clearTargetStorageContainer,
 } from "@azure/ai-document-translation";
 import { config } from "dotenv";
 import { extractBatchId } from "./helpers/extractBatchId"; //helper that extracts the id from the operation-location value
+import { wait } from "./helpers/wait";
 
 // Load environment variables from .env
 config();
@@ -42,7 +43,9 @@ async function main() {
   // [REMOVE] Note that users can choose to create a root client or provide a path to get a subclient
   // [REMOVE] for example since we are cocnerned about batch we are creating a subclient for batch that we will
   // [REMOVE] use through the task.
-  const batchClient = DocumentTranslation({ key }, endpoint).path("/batches");
+  const batchClient = createBatchDocumentTranslationPathFirst(endpoint, {
+    key,
+  }).path("/batches");
 
   // 2. Submit the translate batch job
   const batch = await batchClient.post({ body: translationInput });
@@ -78,6 +81,10 @@ async function main() {
         )
       );
     }
+
+    console.log(progress.body.status);
+    // Wait before polling the service. By default waits 5000ms (5 seconds)
+    await wait();
   } while (!terminalStates.includes(progress.body.status));
 
   // [REMOVE] Check if the terminal state was Success otherwise throw an error
